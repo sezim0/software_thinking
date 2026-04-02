@@ -1,0 +1,8 @@
+Loop in a list
+⚫ 실습
+⚫ List comprehension을 사용해서 X를 생성하시오.
+⚫ X={x2| x는 1 이상 10 이하의 자연수}
+
+
+X = [x**2 for x in range (1,11)]
+print (X)
