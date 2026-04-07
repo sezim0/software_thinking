@@ -1,0 +1,37 @@
+버블 정렬 구현
+⚫ n개의 정수로 구성된 리스트 a가 주어졌을 때 작은 값부터 순서대로 정렬
+하는 프로그램을 작성하시오(sort()와 동일 기능 )
+⚫ a=[8,4,9,5]
+⚫ [0..3] 중 가장 큰 수를 찾아 a[3]로 이동시킴
+▪ 8과 4비교 → 순서 교환 a=[4,8,9,5]
+▪ 8과 9비교 → 교환 없음 a=[4,8,9,5]
+▪ 9와 5비교 → 순서 교환 a=[4,8,5,9]
+⚫ [0..2] 중 가장 큰 수를 찾아 a[2]로 이동시킴
+▪ 4과 8비교 → 교환 없음 a=[4,8,5,9]
+▪ 8과 5비교 → 순서 교환 a=[4,5,8,9]
+⚫ [0..1] 중 가장 큰 수를 찾아 a[1]로 이동시킴
+▪ 4과 5비교 → 교환 없음 a=[4,5,8,9]
+
+
+def bubble_sort(a):
+    n = len(a)
+
+    for i in range(n - 1):
+        swapped = False
+        for j in range(n - 1 - i):
+            if a[j] > a[j+1]:
+                a[j], a[j+1] = a[j+1], a[j]
+                swapped = True
+        if not swapped:
+            break
+
+    print(f"Sorted list: {a}")
+
+# Example usage:
+a = [8, 4, 9, 5]
+bubble_sort(a)
+
+# Another example
+b = [5, 1, 4, 2, 8]
+print("--- New Example ---")
+bubble_sort(b)
