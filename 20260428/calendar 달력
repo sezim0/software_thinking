@@ -42,3 +42,39 @@ while True:
         my_calendar.print_month_calendar(month_to_display)
     except ValueError:
         print("유효한 숫자를 입력하거나 'q'를 입력하세요.")
+
+
+
+
+
+
+OR
+
+
+
+
+import calendar
+
+class SimpleCalendar:
+    def __init__(self, year=2015):
+        self.year = year
+        # Set starting day to Sunday (6) or Monday (0). Default is Monday.
+        self.cal = calendar.TextCalendar(calendar.SUNDAY)
+
+    def show_month(self, month):
+        if 1 <= month <= 12:
+            # formatmonth returns a string representing the month's calendar
+            print(self.cal.formatmonth(self.year, month))
+        else:
+            print("Please enter a month between 1 and 12.")
+
+# Usage
+my_cal = SimpleCalendar()
+while True:
+    val = input("Enter month (1-12) or 'q' to quit: ")
+    if val.lower() == 'q':
+        break
+    if val.isdigit():
+        my_cal.show_month(int(val))
+    else:
+        print("Invalid input.")
