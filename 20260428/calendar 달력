@@ -78,3 +78,53 @@ while True:
         my_cal.show_month(int(val))
     else:
         print("Invalid input.")
+
+
+
+
+
+OR
+
+
+import calendar
+
+class CalendarBot:
+    def __init__(self):
+        # This part sets up the "machine"
+        self.year = 2015
+        self.output_style = calendar.TextCalendar(calendar.SUNDAY)
+
+    def print_month(self, month_number):
+        # This part is the "action" the machine performs
+        grid = self.output_style.formatmonth(self.year, month_number)
+        print(grid)
+
+# --- HOW TO USE IT ---
+bot = CalendarBot() # Create one instance of the machine
+bot.print_month(10) # Tell the machine to do its job for month 10
+
+
+
+
+OR
+
+
+
+import calendar
+
+# 1. Setup: Use 2015 and start weeks on Sunday
+cal = calendar.TextCalendar(calendar.SUNDAY)
+
+while True:
+    val = input("Enter month (1-12) or 'q' to quit: ")
+
+    if val.lower() == 'q':
+        break  # Stop the program
+    
+    # 2. Check if the input is a number
+    if val.isdigit():
+        month_num = int(val)
+        # 3. Print the calendar for the year 2015 and the month chosen
+        print(cal.formatmonth(2015, month_num))
+    else:
+        print("Invalid input.")
