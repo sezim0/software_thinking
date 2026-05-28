@@ -1,72 +1,60 @@
 import os
 
-def get_all_files(folder_path, base_path=""):
-    """
-    Digs through a folder and returns a dictionary of all files.
-    The dictionary uses the 'relative path' (name) as the key, 
-    and a tuple of (size, full_path) as the value.
-    """
-    files_dict = {}
+# --- 1. The Short Helper Function ---
+def get_files(path, base=""):
+    result = {}
     
-    try:
-        with os.scandir(folder_path) as entries:
-            for entry in entries:
-                # Calculate the path relative to the top folder so we can compare Dir A and Dir B accurately
-                relative_path = os.path.join(base_path, entry.name)
+    # os.scandir() is required by the professor
+    with os.scandir(path) as entries:
+        for entry in entries:
+            # Create relative name (e.g., "subfolder/a.txt")
+            rel_name = os.path.join(base, entry.name)
+            
+            if entry.is_file():
+                # Just save the path! Nothing else.
+                result[rel_name] = entry.path         
+            elif entry.is_dir():
+                # Recursion: Required by the professor to check sub-directories
+                result.update(get_files(entry.path, rel_name))
                 
-                if entry.is_file():
-                    # os.stat().st_size gets the exact file size in bytes as requested by the prof
-                    file_size = os.stat(entry.path).st_size 
-                    files_dict[relative_path] = (file_size, entry.path)
-                
-                elif entry.is_dir():
-                    # Recursion: Dig into sub-folders and combine the results
-                    sub_files = get_all_files(entry.path, relative_path)
-                    files_dict.update(sub_files)
-    except (FileNotFoundError, PermissionError):
-        pass
-        
-    return files_dict
+    return result
 
-def compare_directories(dir1, dir2):
-    print(f"\nScanning: {dir1} and {dir2}...\n")
+# --- 2. The Simple Comparison ---
+def compare_folders():
+    dir1 = input("Enter Folder 1: ")
+    dir2 = input("Enter Folder 2: ")
     
-    # 1. Get all files from both directories
-    files1 = get_all_files(dir1)
-    files2 = get_all_files(dir2)
+    files1 = get_files(dir1)
+    files2 = get_files(dir2)
     
-    # 2. Check if they have the SAME NUMBER of files
+    # Check 1: File Count
     if len(files1) != len(files2):
-        print(f"❌ FAIL: Different number of files. ({dir1} has {len(files1)}, {dir2} has {len(files2)})")
+        print("❌ Different number of files.")
         return
-    else:
-        print(f"✅ PASS: Both directories have {len(files1)} files.")
-
-    # 3. Check File Names, Sizes, and Contents
-    for rel_path in files1:
-        # Check if the exact filename exists in Directory 2
-        if rel_path not in files2:
-            print(f"❌ FAIL: File '{rel_path}' is missing in {dir2}.")
-            return
-            
-        size1, full_path1 = files1[rel_path]
-        size2, full_path2 = files2[rel_path]
         
-        # Check if sizes match using os.stat() data
-        if size1 != size2:
-            print(f"❌ FAIL: Size mismatch for '{rel_path}'. ({size1} bytes vs {size2} bytes)")
+    # Check 2: Names, Sizes, and Content
+    for name in files1:
+        # Check if the name exists in Folder 2
+        if name not in files2:
+            print(f"❌ '{name}' is missing in Folder 2.")
             return
             
-        # Check if contents match by reading the files
-        with open(full_path1, 'rb') as f1, open(full_path2, 'rb') as f2:
+        # Get the full computer paths for both files
+        p1 = files1[name]
+        p2 = files2[name]
+        
+        # Compare Size using os.stat() as required by the professor
+        if os.stat(p1).st_size != os.stat(p2).st_size:
+            print(f"❌ Size mismatch for '{name}'.")
+            return
+            
+        # Compare Content (Using 'rb' to safely read ANY file type)
+        with open(p1, 'rb') as f1, open(p2, 'rb') as f2:
             if f1.read() != f2.read():
-                print(f"❌ FAIL: Content mismatch inside '{rel_path}'. The text/data is different.")
+                print(f"❌ Content mismatch for '{name}'.")
                 return
 
-    print("✅ SUCCESS: Both directories are perfectly identical in names, sizes, and contents!")
+    print("✅ Success! Both folders are perfectly identical.")
 
-# Get input from the user
-folder1 = input("Enter the FIRST directory path: ")
-folder2 = input("Enter the SECOND directory path: ")
-
-compare_directories(folder1, folder2)
+# --- 3. Run it ---
+compare_folders()
