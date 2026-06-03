@@ -32,11 +32,13 @@ def get_files(d):
 def compare():
     d1 = get_dir("첫 번째 디렉토리: ")
     d2 = get_dir("두 번째 디렉토리: ")
-    
+
     if get_files(d1) == get_files(d2):
         print("같음")
     else:
         print("다름")
+
+compare()
 
 
 #OR
