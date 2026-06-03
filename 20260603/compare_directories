@@ -1,0 +1,154 @@
+'''
+BASIC 
+⚫ 지난 시험의 연장선
+⚫ [문제 2] 현재 디렉토리에서 두 개의 디렉토리 이름을 입력 받고, 그 두 디렉
+토리에 있는 파일들의 수와 이름들이 같고, 같은 이름의 파일이라면 그 크기
+도 모두 같은지를 비교하여, “같음” 또는 “다름”을 출력하는 프로그램을 작
+성하라. (파일의 내용이 같은지는 상관없다.)
+⚫ 에서 입력된 디렉토리에 대한 에러 처리 후 다시 디렉토리 이름을 다시 입력
+▪ 에러 : 애초에 그런 이름의 뭔가가 없는 경우
+▪ 에러 : 있기는 있는데 디렉토리가 아닌 경우
+'''
+  
+
+import os
+
+
+def input_directory(prompt):
+    while True:
+        name = input(prompt).strip()
+
+        if not os.path.exists(name):
+            print("Error: no such file or directory. Try again.")
+            continue
+
+        if not os.path.isdir(name):
+            print("Error: that name exists, but it is not a directory. Try again.")
+            continue
+
+        try:
+            os.listdir(name)
+        except PermissionError:
+            print("Error: no permission to read that directory. Try again.")
+            continue
+
+        return name
+
+
+def collect_tree(directory, relative_path=""):
+    result = {}
+
+    try:
+        names = os.listdir(directory)
+    except PermissionError:
+        result[relative_path] = ("NO_PERMISSION", None)
+        return result
+
+    for name in names:
+        full_path = os.path.join(directory, name)
+        child_relative = os.path.join(relative_path, name)
+
+        if os.path.isdir(full_path):
+            result[child_relative] = ("DIR", None)
+            result.update(collect_tree(full_path, child_relative))
+        elif os.path.isfile(full_path):
+            result[child_relative] = ("FILE", os.path.getsize(full_path))
+        else:
+            pass
+
+    return result
+
+
+dir1 = input_directory("First directory name: ")
+dir2 = input_directory("Second directory name: ")
+
+tree1 = collect_tree(dir1)
+tree2 = collect_tree(dir2)
+
+if tree1 == tree2:
+    print("같음")
+else:
+    print("다름")
+
+
+
+
+
+
+  
+
+
+
+
+ 
+
+'''
+  RECURSIVE
+  ⚫ 기말 고사
+⚫ 다음 시험의 연장선
+▪ 다음 시험 문제에서 디렉토리 아래 또 디렉토리가 있는 경우 따라가며 비교
+(recursive)
+▪ 입력된 디렉토리가 접근 제한인 경우 exception 처리하기
+▪ 파이썬의 pass 키워드 이래하기
+'''
+
+  
+
+  import os
+
+
+def input_directory(prompt):
+    while True:
+        name = input(prompt).strip()
+
+        if not os.path.exists(name):
+            print("Error: no such file or directory. Try again.")
+            continue
+
+        if not os.path.isdir(name):
+            print("Error: that name exists, but it is not a directory. Try again.")
+            continue
+
+        try:
+            os.listdir(name)
+        except PermissionError:
+            print("Error: no permission to read that directory. Try again.")
+            continue
+
+        return name
+
+
+def collect_tree(directory, relative_path=""):
+    result = {}
+
+    try:
+        names = os.listdir(directory)
+    except PermissionError:
+        result[relative_path] = ("NO_PERMISSION", None)
+        return result
+
+    for name in names:
+        full_path = os.path.join(directory, name)
+        child_relative = os.path.join(relative_path, name)
+
+        if os.path.isdir(full_path):
+            result[child_relative] = ("DIR", None)
+            result.update(collect_tree(full_path, child_relative))
+        elif os.path.isfile(full_path):
+            result[child_relative] = ("FILE", os.path.getsize(full_path))
+        else:
+            pass
+
+    return result
+
+
+dir1 = input_directory("First directory name: ")
+dir2 = input_directory("Second directory name: ")
+
+tree1 = collect_tree(dir1)
+tree2 = collect_tree(dir2)
+
+if tree1 == tree2:
+    print("같음")
+else:
+    print("다름")
