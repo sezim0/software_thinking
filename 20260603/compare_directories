@@ -9,7 +9,38 @@ BASIC
 ▪ 에러 : 애초에 그런 이름의 뭔가가 없는 경우
 ▪ 에러 : 있기는 있는데 디렉토리가 아닌 경우
 '''
-  
+import os
+
+def get_dir(prompt):
+    while True:
+        p = input(prompt).strip()
+        if os.path.isdir(p):
+            return p
+        if os.path.exists(p):
+            print("있기는 있는데 디렉토리가 아닙니다.")
+        else:
+            print("애초에 그런 이름의 뭔가가 없습니다.")
+
+def get_files(d):
+    f_dict = {}
+    with os.scandir(d) as it:
+        for e in it:
+            if e.is_file():
+                f_dict[e.name] = e.stat().st_size
+    return f_dict
+
+def compare():
+    d1 = get_dir("첫 번째 디렉토리: ")
+    d2 = get_dir("두 번째 디렉토리: ")
+    
+    if get_files(d1) == get_files(d2):
+        print("같음")
+    else:
+        print("다름")
+
+
+#OR
+
 
 import os
 
