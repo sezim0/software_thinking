@@ -185,3 +185,116 @@ if tree1 == tree2:
     print("같음")
 else:
     print("다름")
+
+
+
+
+
+
+
+
+
+
+
+#RECURSIVE
+
+import os
+import sys
+
+# ═══════════════════════════════════════════════════════════════
+# PART 1: 현재 폴더에 하위 디렉토리가 2개 이상인지 확인
+#         (이 검사가 맨 먼저 실행됨)
+# ═══════════════════════════════════════════════════════════════
+
+subdirs_here = [e for e in os.scandir(".") if e.is_dir()]
+if len(subdirs_here) < 2:
+    print("디렉토리 개수 부족")
+    sys.exit()          # 프로그램 즉시 종료
+
+
+# ═══════════════════════════════════════════════════════════════
+# PART 2: 유효한 디렉토리 이름을 입력받는 함수
+#         에러가 있으면 다시 입력 (while True 루프)
+# ═══════════════════════════════════════════════════════════════
+
+def get_valid_dir(prompt):
+    while True:
+        dir_name = input(prompt)
+
+        if not os.path.exists(dir_name):
+            # 에러 ①: 그런 이름의 파일/디렉토리가 아예 없는 경우
+            print("에러: 해당 이름의 파일/디렉토리가 없습니다.")
+
+        elif not os.path.isdir(dir_name):
+            # 에러 ②: 있긴 한데 디렉토리가 아닌 경우 (파일인 경우)
+            print("에러: 디렉토리가 아닙니다.")
+
+        else:
+            return dir_name     # 유효한 경우에만 반환
+
+
+# ═══════════════════════════════════════════════════════════════
+# PART 3: 두 디렉토리를 재귀적으로 비교하는 함수
+#         PermissionError 예외 처리 포함
+# ═══════════════════════════════════════════════════════════════
+
+def compare_dirs(path1, path2):
+
+    # ── 접근 제한(PermissionError) 예외 처리 ──────────────────
+    try:
+        # os.scandir()는 DirEntry 객체들의 이터레이터를 반환
+        # sorted()로 이름순 정렬해서 리스트로 만들기
+        entries1 = sorted(os.scandir(path1), key=lambda e: e.name)
+        entries2 = sorted(os.scandir(path2), key=lambda e: e.name)
+
+    except PermissionError:
+        print("접근 제한:", path1)
+        pass        # ← pass: 아무것도 하지 않고 넘어감 (예외를 조용히 무시)
+        return True # 접근 불가 디렉토리는 비교 생략 → 같다고 간주
+
+    # ── 파일과 디렉토리로 분류 ────────────────────────────────
+    # DirEntry 객체의 .is_file() / .is_dir() 메서드 사용
+    files1 = [e for e in entries1 if e.is_file()]
+    files2 = [e for e in entries2 if e.is_file()]
+    dirs1  = [e for e in entries1 if e.is_dir()]
+    dirs2  = [e for e in entries2 if e.is_dir()]
+
+    # ── 파일 개수 비교 ────────────────────────────────────────
+    if len(files1) != len(files2):
+        return False
+
+    # ── 파일 이름 비교 ────────────────────────────────────────
+    # .name 속성으로 이름만 추출해서 리스트로 비교
+    if [f.name for f in files1] != [f.name for f in files2]:
+        return False
+
+    # ── 파일 크기 비교 ────────────────────────────────────────
+    # .stat().st_size 로 파일 크기(바이트) 조회
+    for f1, f2 in zip(files1, files2):
+        if f1.stat().st_size != f2.stat().st_size:
+            return False
+
+    # ── 하위 디렉토리 이름/개수 비교 ─────────────────────────
+    if [d.name for d in dirs1] != [d.name for d in dirs2]:
+        return False
+
+    # ── 재귀(Recursive): 하위 디렉토리도 같은 방식으로 비교 ──
+    # .path 속성으로 전체 경로 전달
+    for d1, d2 in zip(dirs1, dirs2):
+        if not compare_dirs(d1.path, d2.path):
+            return False
+
+    return True     # 여기까지 왔으면 모두 같음
+
+
+# ═══════════════════════════════════════════════════════════════
+# PART 4: 메인 실행
+# ═══════════════════════════════════════════════════════════════
+
+dir1 = get_valid_dir("첫 번째 디렉토리 이름: ")
+dir2 = get_valid_dir("두 번째 디렉토리 이름: ")
+
+if compare_dirs(dir1, dir2):
+    print("같음")
+else:
+    print("다름")
